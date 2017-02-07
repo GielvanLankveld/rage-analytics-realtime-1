@@ -65,6 +65,10 @@ public class ESGameplayState extends GameplayState {
 		resultsIndex = DBUtils.getResultsIndex(sessionId);
 	}
 
+	public TransportClient getTransportClient() {
+		return client;
+	}
+
 	@Override
 	public void setProperty(String versionId, String gameplayId, String key,
 			Object value) {

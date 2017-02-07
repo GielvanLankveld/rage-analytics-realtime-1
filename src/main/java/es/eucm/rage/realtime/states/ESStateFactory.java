@@ -22,8 +22,10 @@ import org.apache.storm.trident.state.State;
 import org.apache.storm.trident.state.StateFactory;
 
 import java.util.Map;
+import org.elasticsearch.client.transport.TransportClient;
 
 public class ESStateFactory implements StateFactory {
+	private TransportClient client;
 
 	private EsConfig config;
 
@@ -41,7 +43,12 @@ public class ESStateFactory implements StateFactory {
 			int partitionIndex, int numPartitions) {
 		ESGameplayState esGameplayState = new ESGameplayState(
 				DBUtils.getClient(config), config.getSessionId());
+		client = esGameplayState.getTransportClient();
 		return esGameplayState;
+	}
+
+	public TransportClient getTransportClient() {
+		return client;
 	}
 
 	public EsConfig getConfig() {

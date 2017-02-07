@@ -17,11 +17,13 @@ package es.eucm.rage.realtime.topologies;
 
 import es.eucm.rage.realtime.filters.FieldValueFilter;
 import es.eucm.rage.realtime.filters.FieldValuesOrFilter;
+import es.eucm.rage.realtime.functions.MeanCreation;
 import es.eucm.rage.realtime.functions.PropertyCreator;
 import es.eucm.rage.realtime.functions.SimplePropertyCreator;
 import es.eucm.rage.realtime.functions.SuffixPropertyCreator;
 import es.eucm.rage.realtime.functions.TraceFieldExtractor;
 import es.eucm.rage.realtime.states.DocumentBuilder;
+import es.eucm.rage.realtime.states.DocumentMeanBuilder;
 import es.eucm.rage.realtime.states.ESStateFactory;
 import es.eucm.rage.realtime.states.GameplayStateUpdater;
 import es.eucm.rage.realtime.states.TraceStateUpdater;
@@ -189,12 +191,28 @@ public class RealtimeTopology extends TridentTopology {
 				.partitionPersist(elasticStateFactory,
 						new Fields("versionId", "gameplayId", "p", "v"),
 						gameplayStateUpdater);
-
-		/*
-		 * --> Additional/custom analysis needed can be added here or changing
-		 * the code above <--
+                
+		
+                
+                gameplayIdStream 
+                        .each(new Fields("trace"), new MeanCreation(elasticStateFactory.getTransportClient(), 
+                                elasticStateFactory.getConfig().getSessionId()), 
+                                new Fields("testScore")) 
+                        .each(
+				new Fields("testScore"),
+				new DocumentMeanBuilder(elasticStateFactory.getConfig()
+						.getSessionId(), "testScore"), new Fields("document"))
+				.partitionPersist(elasticStateFactory, new Fields("document"),
+						new TraceStateUpdater());
+                      
+                
+                /*
+		 * // My atteplt at a custom analysis 
+                /* --> Additional/custom analysis
+		 * needed can be added here or changing the code above <--
 		 */
-
+		// ---
+		// 'sessionId'
 	}
 
 	protected Stream createTracesStream(Stream stream) {

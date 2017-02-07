@@ -224,6 +224,12 @@ public class RealtimeTopologyTest {
 			}
 			return state;
 		}
+
+                @Override
+                public TransportClient getTransportClient() {
+                    return null; //To change body of generated methods, choose Tools | Templates.
+                }                
+                
 	}
 
 }
